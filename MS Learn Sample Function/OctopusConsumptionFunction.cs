@@ -1,34 +1,41 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using System.Net;
 using System.Net.Http.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using MS_Learn_Sample_Function.Classes;
 using MS_Learn_Sample_Function.Logic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MS_Learn_Sample_Function
 {
-    public static class OctopusConsumptionFunction
+    public  class OctopusConsumptionFunction
     {
-        
+        private readonly ILogger<OctopusConsumptionFunction> _logger;
 
-        [FunctionName("ConsumptionFunction")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get",  Route = null)] HttpRequest req,
-            ILogger log)
+        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _logger = logger;
+        }
+
+        [Function("ConsumptionFunction")]
+
+        public  async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+
+        /*public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get",  Route = null)] HttpRequestData req,
+            ILogger log)*/
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             var services = new ServiceCollection();
             services.AddSingleton<EnergyConsumptionClient>();
@@ -45,17 +52,21 @@ namespace MS_Learn_Sample_Function
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             Energy energyResponse = JsonConvert.DeserializeObject<Energy>(requestBody);
 
-            log.LogInformation($"From : {energyResponse?.from}, To: {energyResponse?.to}");
+            _logger.LogInformation($"From : {energyResponse}, To: {energyResponse?.to}");
 
             dateFrom = dateFrom ?? energyResponse?.from.ToString();
            dateTo = dateTo ?? energyResponse?.to.ToString();
             energyType = energyType ?? energyResponse?.energyType;
-            log.LogInformation($"Logging Statement: {data}");
+            _logger.LogInformation($"Logging Statement: {data}");
 
             
             if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))
             {
-                return new BadRequestObjectResult("Please pass a date range and energy type on the query string or in the request body");
+
+                var responseMessageData = req.CreateResponse(HttpStatusCode.BadRequest);
+                responseMessageData.Headers.Add("Content-Type", "application/json");
+                responseMessageData.WriteString("Please pass a date range and energy type on the query string or in the request body");
+                return responseMessageData;
             }
           
 
@@ -63,13 +74,33 @@ namespace MS_Learn_Sample_Function
 
             try
             { 
-             var response = await common.GetEnergyConsumption(client, dateFrom, dateTo, energyType, log);
-              string responseMessage = JsonConvert.SerializeObject(response);
-              return new OkObjectResult(responseMessage);
+                _logger.LogInformation("Calling GetEnergyConsumption: From: {0}, {1}", dateFrom, dateTo);
+             var response = await  common.GetEnergyConsumption(client, dateFrom, dateTo, energyType, _logger);
+                _logger.LogInformation("Calling GetGasConsumption: From: {0}, {1}", dateFrom, dateTo);
+                var gasResponse = await common.GetGasConsumption(dateFrom, dateTo, _logger);
+
+                
+
+                var mergedResponse = new { Electricity = response, Gas = gasResponse };
+
+                
+                _logger.LogInformation("Response: {0}", JsonConvert.SerializeObject(mergedResponse));
+
+              string responseMessage = JsonConvert.SerializeObject(mergedResponse);
+
+var responseMessageData = req.CreateResponse(HttpStatusCode.OK);
+                responseMessageData.Headers.Add("Content-Type", "application/json");
+                responseMessageData.WriteString(responseMessage);
+                return responseMessageData;
+                //
+             
             }catch(Exception ex)
             {
-                log.LogError(ex.Message);
-                return new BadRequestObjectResult("An error occurred");
+                _logger.LogError(ex.Message);
+                var responseMessageData = req.CreateResponse(HttpStatusCode.BadRequest);
+                responseMessageData.Headers.Add("Content-Type", "application/json");
+                responseMessageData.WriteString("An error occurred");
+                return responseMessageData;
             }
            
 
