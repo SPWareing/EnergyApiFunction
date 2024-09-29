@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace MS_Learn_Sample_Function
 {
@@ -12,7 +12,8 @@ namespace MS_Learn_Sample_Function
 
             var host = new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults()
-                .ConfigureServices(services => {
+                .ConfigureServices(services =>
+                {
                     services.AddApplicationInsightsTelemetryWorkerService();
                     services.ConfigureFunctionsApplicationInsights();
                 })

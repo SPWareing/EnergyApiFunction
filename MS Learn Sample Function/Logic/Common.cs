@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Logging;
+using MS_Learn_Sample_Function.Classes;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Http;
-using Microsoft.Extensions.Logging;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
-using MS_Learn_Sample_Function.Classes;
 
 namespace MS_Learn_Sample_Function.Logic
 {
 
-    
 
-    public  class Common
+
+    public class Common
     {
         private static string userName = Environment.GetEnvironmentVariable("ApiKEY");
         private string mpan = Environment.GetEnvironmentVariable("Elec_MPAN");
@@ -25,7 +24,8 @@ namespace MS_Learn_Sample_Function.Logic
         private string accountNumber = Environment.GetEnvironmentVariable("Account_NO");
         private static string uri = "https://api.octopus.energy/v1/";
 
-        private static HttpClient MyClient() { 
+        private static HttpClient MyClient()
+        {
             var client = new HttpClient();
             client.BaseAddress = new Uri(uri);
             client.DefaultRequestHeaders.Accept.Clear();
@@ -36,7 +36,7 @@ namespace MS_Learn_Sample_Function.Logic
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
             return client;
         }
-        
+
         public static Dictionary<string, string> GetDates(string dateFrom, string dateTo)
         {
             string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
@@ -51,8 +51,8 @@ namespace MS_Learn_Sample_Function.Logic
         }
 
 
-        public  async Task<EnergyConsumption> GetEnergyConsumption(HttpClient _client, string dateFrom, string dateTo, string energyType, ILogger log)
-        {                        
+        public async Task<EnergyConsumption> GetEnergyConsumption(string dateFrom, string dateTo, string energyType, ILogger log)
+        {
             /*string password = "";           
             
             var byteArray = Encoding.ASCII.GetBytes($"{userName}:{password}");
@@ -73,14 +73,14 @@ namespace MS_Learn_Sample_Function.Logic
             var request = $"{accountDetails}{queryString}";
 
             log.LogInformation($"Request: {request}");
-            
+
 
             var response = await client.GetFromJsonAsync<EnergyConsumption>(request);
             return response;
 
         }
 
-        public async Task<GasConsumption> GetGasConsumption(string dateFrom, string dateTo,  ILogger log)
+        public async Task<GasConsumption> GetGasConsumption(string dateFrom, string dateTo, ILogger log)
         {
             var client = MyClient();
             string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";
@@ -102,10 +102,10 @@ namespace MS_Learn_Sample_Function.Logic
 
         }
 
-        
+
 
     }
 
 
-    
+
 }

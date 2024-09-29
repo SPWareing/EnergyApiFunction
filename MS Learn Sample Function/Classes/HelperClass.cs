@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace MS_Learn_Sample_Function.Classes
 {
@@ -9,7 +7,7 @@ namespace MS_Learn_Sample_Function.Classes
     {
 
         public DateTime from { get; set; }
-       public  DateTime to { get; set; }
+        public DateTime to { get; set; }
         public string energyType { get; set; }
 
     }

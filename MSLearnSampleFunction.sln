@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.33027.164
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS Learn Sample Function", "MS Learn Sample Function\MS Learn Sample Function.csproj", "{5CBED581-B366-45E2-B311-6994E4D3AED8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy Function", "MS Learn Sample Function\Energy Function.csproj", "{5CBED581-B366-45E2-B311-6994E4D3AED8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
