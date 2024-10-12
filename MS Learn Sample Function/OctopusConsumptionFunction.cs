@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MS_Learn_Sample_Function
@@ -14,10 +15,15 @@ namespace MS_Learn_Sample_Function
     public class OctopusConsumptionFunction
     {
         private readonly ILogger<OctopusConsumptionFunction> _logger;
+        private readonly HttpClient _client;
+        private readonly TodoClient _todoClient;
+        
 
-        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger)
+        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger, HttpClient client, TodoClient todoClient)
         {
             _logger = logger;
+           _client = client;
+            _todoClient = todoClient;
         }
 
         [Function("ConsumptionFunction")]
@@ -31,7 +37,7 @@ namespace MS_Learn_Sample_Function
 
             var common = new Common();
 
-
+            var get = await _todoClient.GetTodo();
 
             string dateFrom = req.Query["from"];
             string dateTo = req.Query["to"];

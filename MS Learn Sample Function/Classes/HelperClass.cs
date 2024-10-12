@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MS_Learn_Sample_Function.Classes
 {
@@ -48,7 +50,36 @@ namespace MS_Learn_Sample_Function.Classes
             _httpClient.BaseAddress = new Uri("https://api.octopus.energy/v1/electricity-meter-points/");
         }
 
-
-
     }
+
+    public interface ITodoClient { 
+    }
+
+    public class TodoClient : ITodoClient
+    {
+        private readonly HttpClient _httpClient;
+        public TodoClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+
+            _httpClient.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/todos/1");
+        }
+
+        public async Task<Todo> GetTodo()
+        {
+            var response = await _httpClient.GetAsync("");
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<Todo>(content);
+        }
+    }
+
+    public class Todo
+    {
+        public int userId { get; set; }
+        public int id { get; set; }
+        public string title { get; set; }
+        public bool completed { get; set; }
+    }   
+
 }
