@@ -55,13 +55,9 @@ namespace MS_Learn_Sample_Function
             _logger.LogInformation($"Logging Statement: {data}");
 
 
-            if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))
-            {
-
-                var responseMessageData = req.CreateResponse(HttpStatusCode.BadRequest);
-                responseMessageData.Headers.Add("Content-Type", "application/json");
-                responseMessageData.WriteString("Please pass a date range and energy type on the query string or in the request body");
-                return responseMessageData;
+            if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))           {
+                              
+                return FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
 
 
@@ -70,33 +66,21 @@ namespace MS_Learn_Sample_Function
             try
             {
                 _logger.LogInformation("Calling GetEnergyConsumption: From: {0}, {1}", dateFrom, dateTo);
-                var response = await common.GetEnergyConsumption(dateFrom, dateTo, energyType, _logger);
+                var response = await common.GetEnergyConsumption(dateFrom, dateTo, _logger);
                 _logger.LogInformation("Calling GetGasConsumption: From: {0}, {1}", dateFrom, dateTo);
                 var gasResponse = await common.GetGasConsumption(dateFrom, dateTo, _logger);
-
-
-
                 var mergedResponse = new { Electricity = response, Gas = gasResponse };
-
-
                 _logger.LogInformation("Response: {0}", JsonConvert.SerializeObject(mergedResponse));
-
-                string responseMessage = JsonConvert.SerializeObject(mergedResponse);
-
-                var responseMessageData = req.CreateResponse(HttpStatusCode.OK);
-                responseMessageData.Headers.Add("Content-Type", "application/json");
-                responseMessageData.WriteString(responseMessage);
-                return responseMessageData;
-                //
+                string responseMessage = JsonConvert.SerializeObject(mergedResponse);                
+                return FormatResponse(req, HttpStatusCode.OK, responseMessage);
+                
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                var responseMessageData = req.CreateResponse(HttpStatusCode.BadRequest);
-                responseMessageData.Headers.Add("Content-Type", "application/json");
-                responseMessageData.WriteString("An error occurred");
-                return responseMessageData;
+               
+                return FormatResponse(req, HttpStatusCode.BadRequest, "An error occured");
             }
 
 
@@ -104,6 +88,14 @@ namespace MS_Learn_Sample_Function
 
 
 
+        }
+
+        public static HttpResponseData FormatResponse( HttpRequestData req, HttpStatusCode HttPStatusCode, string message)
+        {   
+            var responseMessageData = req.CreateResponse(HttPStatusCode);
+            responseMessageData.Headers.Add("Content-Type", "application/json");
+            responseMessageData.WriteString(message);
+            return responseMessageData;
         }
 
 
