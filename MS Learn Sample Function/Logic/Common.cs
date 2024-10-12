@@ -12,8 +12,9 @@ using System.Threading.Tasks;
 namespace MS_Learn_Sample_Function.Logic
 {
 
-
-
+    /// <summary>
+    /// Provides common functionality for interacting with the Octopus Energy API.
+    /// </summary>
     public class Common
     {
         private static readonly string userName = Environment.GetEnvironmentVariable("ApiKEY");
@@ -25,6 +26,10 @@ namespace MS_Learn_Sample_Function.Logic
         private static readonly string uri = "https://api.octopus.energy/v1/";
 
         private static readonly HttpClient _client = MyClient();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClient"/> class.
+        /// </summary>
+        /// <returns>An initialized <see cref="HttpClient"/> instance.</returns>
         private static HttpClient MyClient()
         {
             var client = new HttpClient
@@ -42,11 +47,11 @@ namespace MS_Learn_Sample_Function.Logic
         }
 
         /// <summary>
-        /// Returns a Dictionary of the Dates
+        /// Returns a dictionary of the dates in UTC format.
         /// </summary>
-        /// <param name="dateFrom">Start Date </param>
-        /// <param name="dateTo">End Date</param>
-        /// <returns>Dictionary of <paramref name="dateFrom"/> and <paramref name="dateTo"/> in UTC format</returns>
+        /// <param name="dateFrom">Start date.</param>
+        /// <param name="dateTo">End date.</param>
+        /// <returns>A dictionary containing the start and end dates in UTC format.</returns>
         public static Dictionary<string, string> GetDates(string dateFrom, string dateTo)
         {
             string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
@@ -59,7 +64,15 @@ namespace MS_Learn_Sample_Function.Logic
             };
 
         }
-
+        /// <summary>
+        /// Fetches the result from the Octopus Energy API.
+        /// </summary>
+        /// <typeparam name="T">The type of the result.</typeparam>
+        /// <param name="accountDetails">The account details for the request.</param>
+        /// <param name="log">The logger instance.</param>
+        /// <param name="dateFrom">The start date for the request.</param>
+        /// <param name="dateTo">The end date for the request.</param>
+        /// <returns>The result of the request.</returns>
 
         public async Task<T> GetResultAsync<T>(string accountDetails, ILogger log, string dateFrom, string dateTo)
         {
@@ -82,12 +95,12 @@ namespace MS_Learn_Sample_Function.Logic
             }
         }
         /// <summary>
-        /// Returns the Energy Consumption
+        /// Returns the energy consumption.
         /// </summary>
-        /// <param name="dateFrom">Start Date</param>
-        /// <param name="dateTo">End Date</param>
-        /// <param name="log">ILogger</param>
-        /// <returns>An object of the Energy Consumption Class</returns>
+        /// <param name="dateFrom">The start date for the request.</param>
+        /// <param name="dateTo">The end date for the request.</param>
+        /// <param name="log">The logger instance.</param>
+        /// <returns>An object of the <see cref="EnergyConsumption"/> class.</returns>
         public async Task<EnergyConsumption> GetEnergyConsumption(string dateFrom, string dateTo, ILogger log)
         {
             string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";
@@ -95,12 +108,12 @@ namespace MS_Learn_Sample_Function.Logic
 
         }
         /// <summary>
-        /// Returns the Gas Consumption
+        /// Returns the gas consumption.
         /// </summary>
-        /// <param name="dateFrom">Start Date</param>
-        /// <param name="dateTo">End Date</param>
-        /// <param name="log"> ILogger</param>
-        /// <returns> An Object of the Gas Consumption Class</returns>
+        /// <param name="dateFrom">The start date for the request.</param>
+        /// <param name="dateTo">The end date for the request.</param>
+        /// <param name="log">The logger instance.</param>
+        /// <returns>An object of the <see cref="GasConsumption"/> class.</returns>
         public async Task<GasConsumption> GetGasConsumption(string dateFrom, string dateTo, ILogger log)
         {
             string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";

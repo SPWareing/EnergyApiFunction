@@ -4,6 +4,7 @@
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<RootNamespace>My.Namespace</RootNamespace>
 		<OutputType>Exe</OutputType>
+		<StartupObject>MS_Learn_Sample_Function.Program</StartupObject>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />

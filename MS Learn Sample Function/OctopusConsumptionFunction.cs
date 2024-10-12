@@ -26,7 +26,6 @@ namespace MS_Learn_Sample_Function
         }
 
         [Function("ConsumptionFunction")]
-
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
 
 
@@ -83,12 +82,12 @@ namespace MS_Learn_Sample_Function
             }
         }
 
-        public static HttpResponseData FormatResponse(HttpRequestData req, HttpStatusCode HttPStatusCode, string message)
+        public static HttpResponseData FormatResponse(HttpRequestData req, HttpStatusCode HttpStatusCode, string message)
         {
-            var responseMessageData = req.CreateResponse(HttPStatusCode);
-            responseMessageData.Headers.Add("Content-Type", "application/json");
-            responseMessageData.WriteString(message);
-            return responseMessageData;
+           var responseMessageData = req.CreateResponse(HttpStatusCode);
+           responseMessageData.Headers.Add("Content-Type", "application/json");
+           responseMessageData.WriteString(message);
+           return responseMessageData;
         }
 
 
