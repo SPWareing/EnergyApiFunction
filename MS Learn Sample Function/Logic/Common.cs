@@ -27,10 +27,11 @@ namespace MS_Learn_Sample_Function.Logic
         private static readonly HttpClient _client = MyClient();
         private static HttpClient MyClient()
         {
-            var client = new HttpClient{
+            var client = new HttpClient
+            {
                 BaseAddress = new Uri(uri)
             };
-            
+
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             string password = "";
@@ -40,65 +41,70 @@ namespace MS_Learn_Sample_Function.Logic
             return client;
         }
 
+        /// <summary>
+        /// Returns a Dictionary of the Dates
+        /// </summary>
+        /// <param name="dateFrom">Start Date </param>
+        /// <param name="dateTo">End Date</param>
+        /// <returns>Dictionary of <paramref name="dateFrom"/> and <paramref name="dateTo"/> in UTC format</returns>
         public static Dictionary<string, string> GetDates(string dateFrom, string dateTo)
         {
             string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
-            return  new Dictionary<string, string>()
+            return new Dictionary<string, string>()
             {
                 { "period_from",DateTime.Parse(dateFrom).ToString(dateFormat) },
                 { "period_to" ,DateTime.Parse(dateTo).ToString(dateFormat) },
                 { "order_by" ,"period"},
                 {"page_size","200"}
             };
-            
+
         }
 
 
-        public async Task<T> GetResultAsync<T>(string  accountDetails, ILogger log, string dateFrom, string dateTo)
+        public async Task<T> GetResultAsync<T>(string accountDetails, ILogger log, string dateFrom, string dateTo)
         {
-            var client = _client;
+
             var requestBody = GetDates(dateFrom, dateTo);
             var queryString = string.Join("&", requestBody.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-
             var request = $"{accountDetails}{queryString}";
+
             try
             {
                 log.LogInformation($"Query String: {queryString}");
                 log.LogInformation($"Request: {request}");
-                var response = await client.GetFromJsonAsync<T>(request);
-            return response;
-        }catch(Exception ex)
+                var response = await _client.GetFromJsonAsync<T>(request);
+                return response;
+            }
+            catch (Exception ex)
             {
-                log.LogError(ex.Message);
+                log.LogError($"Error fetching results: {ex.Message}");
                 return default;
             }
         }
-
+        /// <summary>
+        /// Returns the Energy Consumption
+        /// </summary>
+        /// <param name="dateFrom">Start Date</param>
+        /// <param name="dateTo">End Date</param>
+        /// <param name="log">ILogger</param>
+        /// <returns>An object of the Energy Consumption Class</returns>
         public async Task<EnergyConsumption> GetEnergyConsumption(string dateFrom, string dateTo, ILogger log)
         {
-           
-            var client =_client;
-            string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";           
-
-            var response = await GetResultAsync<EnergyConsumption>(accountDetails, log, dateFrom, dateTo);
-            return response;
+            string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";
+            return await GetResultAsync<EnergyConsumption>(accountDetails, log, dateFrom, dateTo);
 
         }
         /// <summary>
         /// Returns the Gas Consumption
         /// </summary>
-        /// <param name="dateFrom"> Start Date</param>
-        /// <param name="dateTo"> End Date</param>
+        /// <param name="dateFrom">Start Date</param>
+        /// <param name="dateTo">End Date</param>
         /// <param name="log"> ILogger</param>
-        /// <returns> A an Object of the Gas Consumption Class</returns>
+        /// <returns> An Object of the Gas Consumption Class</returns>
         public async Task<GasConsumption> GetGasConsumption(string dateFrom, string dateTo, ILogger log)
         {
-            var client = _client;
-            string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";        
-           
-           var response = await GetResultAsync<GasConsumption>(accountDetails, log, dateFrom, dateTo);           
-            return response;
-
+            string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";
+            return await GetResultAsync<GasConsumption>(accountDetails, log, dateFrom, dateTo);
         }
 
 

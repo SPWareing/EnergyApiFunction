@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace MS_Learn_Sample_Function.Classes
 {
@@ -52,7 +52,8 @@ namespace MS_Learn_Sample_Function.Classes
 
     }
 
-    public interface ITodoClient { 
+    public interface ITodoClient
+    {
     }
 
     public class TodoClient : ITodoClient
@@ -80,6 +81,6 @@ namespace MS_Learn_Sample_Function.Classes
         public int id { get; set; }
         public string title { get; set; }
         public bool completed { get; set; }
-    }   
+    }
 
 }

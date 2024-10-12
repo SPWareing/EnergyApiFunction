@@ -16,14 +16,13 @@ namespace MS_Learn_Sample_Function
     {
         private readonly ILogger<OctopusConsumptionFunction> _logger;
         private readonly HttpClient _client;
-        private readonly TodoClient _todoClient;
-        
 
-        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger, HttpClient client, TodoClient todoClient)
+
+        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger, HttpClient client)
         {
             _logger = logger;
-           _client = client;
-            _todoClient = todoClient;
+            _client = client;
+
         }
 
         [Function("ConsumptionFunction")]
@@ -37,7 +36,7 @@ namespace MS_Learn_Sample_Function
 
             var common = new Common();
 
-            var get = await _todoClient.GetTodo();
+
 
             string dateFrom = req.Query["from"];
             string dateTo = req.Query["to"];
@@ -55,8 +54,8 @@ namespace MS_Learn_Sample_Function
             _logger.LogInformation($"Logging Statement: {data}");
 
 
-            if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))           {
-                              
+            if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))
+            {
                 return FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
 
@@ -71,27 +70,21 @@ namespace MS_Learn_Sample_Function
                 var gasResponse = await common.GetGasConsumption(dateFrom, dateTo, _logger);
                 var mergedResponse = new { Electricity = response, Gas = gasResponse };
                 _logger.LogInformation("Response: {0}", JsonConvert.SerializeObject(mergedResponse));
-                string responseMessage = JsonConvert.SerializeObject(mergedResponse);                
+                string responseMessage = JsonConvert.SerializeObject(mergedResponse);
                 return FormatResponse(req, HttpStatusCode.OK, responseMessage);
-                
+
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-               
+
                 return FormatResponse(req, HttpStatusCode.BadRequest, "An error occured");
             }
-
-
-
-
-
-
         }
 
-        public static HttpResponseData FormatResponse( HttpRequestData req, HttpStatusCode HttPStatusCode, string message)
-        {   
+        public static HttpResponseData FormatResponse(HttpRequestData req, HttpStatusCode HttPStatusCode, string message)
+        {
             var responseMessageData = req.CreateResponse(HttPStatusCode);
             responseMessageData.Headers.Add("Content-Type", "application/json");
             responseMessageData.WriteString(message);
