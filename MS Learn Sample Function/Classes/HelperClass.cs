@@ -3,7 +3,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MS_Learn_Sample_Function.Classes
+namespace Energy_Consumption_Function.Classes
 {
     /// <summary>
     /// Represents energy data with a date range and energy type.
@@ -51,7 +51,7 @@ namespace MS_Learn_Sample_Function.Classes
         public Result[] results { get; set; }
     }
 
-/// <summary>
+    /// <summary>
     /// Represents energy consumption data.
     /// </summary>
     public class EnergyConsumption
@@ -141,5 +141,97 @@ namespace MS_Learn_Sample_Function.Classes
         public string title { get; set; }
         public bool completed { get; set; }
     }
+
+    public class GasTariff
+    {
+        public int count { get; set; }
+        public object next { get; set; }
+        public object previous { get; set; }
+        public ResultTariff[] results { get; set; }
+    }
+    public class ElecTariff
+    {
+        public int count { get; set; }
+        public object next { get; set; }
+        public object previous { get; set; }
+        public ResultTariff[] results { get; set; }
+    }
+
+    public class ResultTariff
+    {
+        public float value_exc_vat { get; set; }
+        public float value_inc_vat { get; set; }
+        public DateTime valid_from { get; set; }
+        public DateTime? valid_to { get; set; }
+        public string payment_method { get; set; }
+    }
+
+
+    public class AccountDetails
+    {
+        public string number { get; set; }
+        public Property1[] properties { get; set; }
+    }
+
+    public class Property1
+    {
+        public int id { get; set; }
+        public DateTime moved_in_at { get; set; }
+        public object moved_out_at { get; set; }
+        public string address_line_1 { get; set; }
+        public string address_line_2 { get; set; }
+        public string address_line_3 { get; set; }
+        public string town { get; set; }
+        public string county { get; set; }
+        public string postcode { get; set; }
+        public Electricity_Meter_Points[] electricity_meter_points { get; set; }
+        public Gas_Meter_Points[] gas_meter_points { get; set; }
+    }
+
+    public class Electricity_Meter_Points
+    {
+        public string mpan { get; set; }
+        public int profile_class { get; set; }
+        public int consumption_standard { get; set; }
+        public Meter[] meters { get; set; }
+        public Agreement[] agreements { get; set; }
+        public bool is_export { get; set; }
+    }
+
+    public class Meter
+    {
+        public string serial_number { get; set; }
+        public Register[] registers { get; set; }
+    }
+
+    public class Register
+    {
+        public string identifier { get; set; }
+        public string rate { get; set; }
+        public bool is_settlement_register { get; set; }
+    }
+
+    public class Agreement
+    {
+        public string tariff_code { get; set; }
+        public DateTime valid_from { get; set; }
+        public DateTime? valid_to { get; set; }
+    }
+
+    public class Gas_Meter_Points
+    {
+        public string mprn { get; set; }
+        public int consumption_standard { get; set; }
+        public Meter[] meters { get; set; }
+        public Agreement[] agreements { get; set; }
+    }
+
+
+
+   
+
+    
+
+
 
 }

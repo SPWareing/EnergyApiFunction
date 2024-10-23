@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
-using MS_Learn_Sample_Function.Classes;
+using Energy_Consumption_Function.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
-namespace MS_Learn_Sample_Function.Logic
+namespace Energy_Consumption_Function.Logic
 {
 
     /// <summary>
@@ -45,6 +47,8 @@ namespace MS_Learn_Sample_Function.Logic
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
             return client;
         }
+
+        
 
         /// <summary>
         /// Returns a dictionary of the dates in UTC format.
@@ -121,6 +125,61 @@ namespace MS_Learn_Sample_Function.Logic
         }
 
 
+        /// <summary>
+        /// Returns the Tariff .
+        /// </summary>
+        /// <param name="dateFrom">The start date for the request.</param>
+        /// <param name="dateTo">The end date for the request.</param>
+        /// <param name="tariffCode">The tariff code.</param>
+        /// <param name="log">The logger instance.</param>
+        /// <returns>An object of either <see cref="GasTariff"/>  or  <see cref="ElecTariff"/> class.</returns>
+        public Task<T> GetTariff<T>(string dateFrom, string dateTo, string tariffCode, string tarifftype, ILogger log) {
+
+            try
+            { 
+            var baseCode = GetTariffCode(tariffCode, log);
+
+            string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
+            return GetResultAsync<T>(accountDetails, log, dateFrom, dateTo);
+            }
+            catch(Exception ex)
+            {
+                log.LogError($"Error fetching gas tariff: {ex.Message}");
+                return default;
+            }
+        }
+
+        public async Task<AccountDetails>GetAccountDetails(ILogger log)
+        {
+            try
+            {
+                string accountDetails = $"accounts/{accountNumber}/";
+                return await _client.GetFromJsonAsync<AccountDetails>(accountDetails);
+            }
+            catch(Exception ex)
+            {
+                log.LogError($"Error fetching account details: {ex.Message}");
+                return default;
+            }
+        }
+
+
+        public string  GetTariffCode( string tariffCode, ILogger log)
+        {
+            var rgx = new Regex(@"[A-Z]{3}-\d{2}-\d{2}-\d{2}");
+
+            if (rgx.IsMatch(tariffCode))
+            {
+                return rgx.Matches(tariffCode)[0].Value;
+            }
+            else
+            {
+                log.LogError("Invalid Tariff Code");
+                return string.Empty;
+            }
+
+            
+        }
 
     }
 

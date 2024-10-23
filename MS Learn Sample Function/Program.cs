@@ -1,10 +1,10 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MS_Learn_Sample_Function.Classes;
+using Energy_Consumption_Function.Classes;
 using System.Net.Http;
 
-namespace MS_Learn_Sample_Function
+namespace Energy_Consumption_Function
 {
     public class Program
     {
