@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy Function", "MS Learn Sample Function\Energy Function.csproj", "{5CBED581-B366-45E2-B311-6994E4D3AED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy Function", "EnergyApiFunction\Energy Function.csproj", "{5CBED581-B366-45E2-B311-6994E4D3AED8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
