@@ -176,7 +176,29 @@ namespace Energy_Consumption_Function.Logic
             {
                 log.LogError("Invalid Tariff Code");
                 return string.Empty;
-            }
+            }            
+        }
+
+        public List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, string tariffType)
+        {
+            switch (tariffType)
+            {
+            
+                case "electricity-tariffs":
+                    return account.properties.First()
+                                .electricity_meter_points.First()
+                                .agreements
+                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
+                                .ToList();
+                case "gas-tariffs":
+                    return account.properties.First()
+                                .gas_meter_points.First()
+                                .agreements
+                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
+                                .ToList();
+                default:
+                               return new List<Agreement>();
+                       }
 
             
         }

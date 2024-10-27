@@ -19,7 +19,7 @@ namespace Energy_Consumption_Function
                     services.AddApplicationInsightsTelemetryWorkerService();
                     services.ConfigureFunctionsApplicationInsights();
                     services.AddSingleton<HttpClient>();
-                    services.AddSingleton<TodoClient>();
+                   
                 })
                 .Build();
             host.Run();

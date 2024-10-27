@@ -59,9 +59,6 @@ namespace Energy_Consumption_Function
                 return FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
 
-
-
-
             try
             {
                 var account = await common.GetAccountDetails(_logger);
@@ -69,20 +66,11 @@ namespace Energy_Consumption_Function
                 var dateFromUtc = DateTime.Parse(dateFrom).Date;
                 var dateToUtc = DateTime.Parse(dateTo).Date;
 
-                var elecTariff = account.properties.First()
-                    .electricity_meter_points.First()
-                    .agreements
-                    .Where(x => dateFromUtc  >=  x.valid_from.Date && (dateToUtc <= x.valid_to || x.valid_to is null))
-                    .ToList();
+                var elecTariff = common.GetAgreementCost(account, dateFromUtc, dateToUtc, "electricity-tariffs");                  
 
-                var gasTariff = account.properties.First()
-                    .gas_meter_points.First()
-                    .agreements
-                    .Where(x => dateFromUtc  >=  x.valid_from.Date && (dateToUtc <= x.valid_to || x.valid_to is null))
-                    .ToList();
+                var gasTariff =  common.GetAgreementCost(account, dateFromUtc, dateToUtc, "gas-tariffs");
 
-
-                var tariff = await common.GetTariff<ElecTariff>(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code, "electricity-tariffs", _logger);
+                var tariff = await common.GetTariff<ElecTariff>(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code, "electricity-tariffs", _logger);
 
                 var tariffGas = await common.GetTariff<GasTariff>(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code,  "gas-tariffs", _logger);
 
