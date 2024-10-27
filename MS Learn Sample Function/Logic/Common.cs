@@ -162,7 +162,12 @@ namespace Energy_Consumption_Function.Logic
                 return default;
             }
         }
-
+        /// <summary>
+        /// Regex to extract the Tariff Code from the string.
+        /// </summary>
+        /// <param name="tariffCode"> Variation of the base tariff </param>
+        /// <param name="log"> ILogger </param>
+        /// <returns>String</returns>
 
         public string  GetTariffCode( string tariffCode, ILogger log)
         {
@@ -178,7 +183,14 @@ namespace Energy_Consumption_Function.Logic
                 return string.Empty;
             }            
         }
-
+        /// <summary>
+        /// Returns a List of Agreements for all the Tariffs in date range.
+        /// </summary>
+        /// <param name="account"> Account Details of the User </param>
+        /// <param name="dateFrom"> UTC Format Date </param>
+        /// <param name="dateTo"> UTC Format Date </param>
+        /// <param name="tariffType"> Either "electricity-tariffs" or "gas-tariffs" </param>
+        /// <returns> A list of <see cref="Agreement"/></returns>
         public List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, string tariffType)
         {
             switch (tariffType)
