@@ -2,6 +2,8 @@
 
 This repository contains an Azure function for making calls to the [Octopus Energy API]("https://developer.octopus.energy/") , built using .NET.
 
+It is designed to fronted by a React App which turns the returned JSON object into an Energy Consumption Dashboard
+
 ## Getting Started
 
 ### Prerequisites
@@ -13,11 +15,11 @@ This repository contains an Azure function for making calls to the [Octopus Ener
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/MSLearnSampleFunction.git
+    git clone https://github.com/yourusername/EnergyApiFunction.git
     ```
 2. Navigate to the project directory:
     ```sh
-    cd MSLearnSampleFunction
+    cd EnergyApiFunction
     ```
 3. Restore the dependencies:
     ```sh
@@ -31,7 +33,7 @@ To run the function locally, use the following command:
 dotnet run
 ```
 
-### Testing
+### Testing TODO 
 
 To run the tests, use the following command:
 ```sh
@@ -50,3 +52,10 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - [Microsoft Learn](https://docs.microsoft.com/en-us/learn/)
 - [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/)
+
+
+TODO: 
+
+[ ] Add Tests
+
+[ ] Add React App repo reference
