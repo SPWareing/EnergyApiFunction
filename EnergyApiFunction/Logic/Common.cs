@@ -27,17 +27,22 @@ namespace Energy_Consumption_Function.Logic
         private readonly string accountNumber = Environment.GetEnvironmentVariable("Account_NO");
         private static readonly string uri = "https://api.octopus.energy/v1/";
 
-        private static readonly HttpClient _client = MyClient();
+        private static  HttpClient _client;
+        private static ILogger _log;
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClient"/> class.
         /// </summary>
         /// <returns>An initialized <see cref="HttpClient"/> instance.</returns>
-        private static HttpClient MyClient()
+        public Common(HttpClient client, ILogger log)
         {
-            var client = new HttpClient
-            {
-                BaseAddress = new Uri(uri)
-            };
+            _client = MyClient(client);
+            _log = log;
+        }
+        private static HttpClient MyClient(HttpClient _client)
+        {
+            var client = _client;
+            
+            client.BaseAddress = new Uri(uri);
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -46,55 +51,35 @@ namespace Energy_Consumption_Function.Logic
             var base64Credentials = Convert.ToBase64String(byteArray);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
             return client;
-        }
+        }        
 
-        
-
-        /// <summary>
-        /// Returns a dictionary of the dates in UTC format.
-        /// </summary>
-        /// <param name="dateFrom">Start date.</param>
-        /// <param name="dateTo">End date.</param>
-        /// <returns>A dictionary containing the start and end dates in UTC format.</returns>
-        public static Dictionary<string, string> GetDates(string dateFrom, string dateTo)
-        {
-            string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
-            return new Dictionary<string, string>()
-            {
-                { "period_from",DateTime.Parse(dateFrom).ToString(dateFormat) },
-                { "period_to" ,DateTime.Parse(dateTo).ToString(dateFormat) },
-                { "order_by" ,"period"},
-                {"page_size","200"}
-            };
-
-        }
+       
         /// <summary>
         /// Fetches the result from the Octopus Energy API.
         /// </summary>
         /// <typeparam name="T">The type of the result.</typeparam>
-        /// <param name="accountDetails">The account details for the request.</param>
-        /// <param name="log">The logger instance.</param>
+        /// <param name="accountDetails">The account details for the request.</param>  
         /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>
         /// <returns>The result of the request.</returns>
 
-        public async Task<T> GetResultAsync<T>(string accountDetails, ILogger log, string dateFrom, string dateTo)
+        public async Task<T> GetResultAsync<T>(string accountDetails, string dateFrom, string dateTo)
         {
 
-            var requestBody = GetDates(dateFrom, dateTo);
+            var requestBody = HelperFunctions.GetDates(dateFrom, dateTo);
             var queryString = string.Join("&", requestBody.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             var request = $"{accountDetails}{queryString}";
 
             try
             {
-                log.LogInformation($"Query String: {queryString}");
-                log.LogInformation($"Request: {request}");
+                _log.LogInformation($"Query String: {queryString}");
+                _log.LogInformation($"Request: {request}");
                 var response = await _client.GetFromJsonAsync<T>(request);
                 return response;
             }
             catch (Exception ex)
             {
-                log.LogError($"Error fetching results: {ex.Message}");
+                _log.LogError($"Error fetching results: {ex.Message}");
                 return default;
             }
         }
@@ -103,12 +88,12 @@ namespace Energy_Consumption_Function.Logic
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>
-        /// <param name="log">The logger instance.</param>
+        
         /// <returns>An object of the <see cref="EnergyConsumption"/> class.</returns>
-        public async Task<EnergyConsumption> GetEnergyConsumption(string dateFrom, string dateTo, ILogger log)
+        public async Task<Consumption> GetEnergyConsumption(string dateFrom, string dateTo)
         {
             string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";
-            return await GetResultAsync<EnergyConsumption>(accountDetails, log, dateFrom, dateTo);
+            return await GetResultAsync<Consumption>(accountDetails, dateFrom, dateTo);
 
         }
         /// <summary>
@@ -118,10 +103,10 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo">The end date for the request.</param>
         /// <param name="log">The logger instance.</param>
         /// <returns>An object of the <see cref="GasConsumption"/> class.</returns>
-        public async Task<GasConsumption> GetGasConsumption(string dateFrom, string dateTo, ILogger log)
+        public async Task<Consumption> GetGasConsumption(string dateFrom, string dateTo)
         {
             string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";
-            return await GetResultAsync<GasConsumption>(accountDetails, log, dateFrom, dateTo);
+            return await GetResultAsync<Consumption>(accountDetails, dateFrom, dateTo);
         }
 
 
@@ -133,23 +118,23 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="tariffCode">The tariff code.</param>
         /// <param name="log">The logger instance.</param>
         /// <returns>An object of either <see cref="GasTariff"/>  or  <see cref="ElecTariff"/> class.</returns>
-        public Task<T> GetTariff<T>(string dateFrom, string dateTo, string tariffCode, string tarifftype, ILogger log) {
+        public Task<T> GetTariff<T>(string dateFrom, string dateTo, string tariffCode, string tarifftype) {
 
             try
             { 
-            var baseCode = GetTariffCode(tariffCode, log);
+            var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
 
             string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
-            return GetResultAsync<T>(accountDetails, log, dateFrom, dateTo);
+            return GetResultAsync<T>(accountDetails,dateFrom, dateTo);
             }
             catch(Exception ex)
             {
-                log.LogError($"Error fetching gas tariff: {ex.Message}");
+                _log.LogError($"Error fetching gas tariff: {ex.Message}");
                 return default;
             }
         }
 
-        public async Task<AccountDetails>GetAccountDetails(ILogger log)
+        public async Task<AccountDetails>GetAccountDetails()
         {
             try
             {
@@ -158,62 +143,11 @@ namespace Energy_Consumption_Function.Logic
             }
             catch(Exception ex)
             {
-                log.LogError($"Error fetching account details: {ex.Message}");
-                return default;
+                _log.LogError($"Error fetching account details: {ex.Message}");
+                throw;
             }
         }
-        /// <summary>
-        /// Regex to extract the Tariff Code from the string.
-        /// </summary>
-        /// <param name="tariffCode"> Variation of the base tariff </param>
-        /// <param name="log"> ILogger </param>
-        /// <returns>String</returns>
-
-        public string  GetTariffCode( string tariffCode, ILogger log)
-        {
-            var rgx = new Regex(@"[A-Z]{3}-\d{2}-\d{2}-\d{2}");
-
-            if (rgx.IsMatch(tariffCode))
-            {
-                return rgx.Matches(tariffCode)[0].Value;
-            }
-            else
-            {
-                log.LogError("Invalid Tariff Code");
-                return string.Empty;
-            }            
-        }
-        /// <summary>
-        /// Returns a List of Agreements for all the Tariffs in date range.
-        /// </summary>
-        /// <param name="account"> Account Details of the User </param>
-        /// <param name="dateFrom"> UTC Format Date </param>
-        /// <param name="dateTo"> UTC Format Date </param>
-        /// <param name="tariffType"> Either "electricity-tariffs" or "gas-tariffs" </param>
-        /// <returns> A list of <see cref="Agreement"/></returns>
-        public List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, string tariffType)
-        {
-            switch (tariffType)
-            {
-            
-                case "electricity-tariffs":
-                    return account.properties.First()
-                                .electricity_meter_points.First()
-                                .agreements
-                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList();
-                case "gas-tariffs":
-                    return account.properties.First()
-                                .gas_meter_points.First()
-                                .agreements
-                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList();
-                default:
-                               return new List<Agreement>();
-                       }
-
-            
-        }
+       
 
     }
 
