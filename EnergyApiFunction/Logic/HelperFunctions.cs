@@ -87,7 +87,7 @@ namespace Energy_Consumption_Function.Logic
 
         }
 
-        public static List<MergedResponse> JoinConsumptionTariffs(Consumption response, ResultTariff dd)
+        public static List<MergedResponse> JoinConsumptionTariffs(Consumption response, TariffList dd)
              {
            var join = response.results.Where(x => x.interval_start.Date >= dd.valid_from.Date)
                     .Select(x => new MergedResponse

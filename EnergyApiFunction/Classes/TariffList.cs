@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Energy_Consumption_Function.Classes
 {
-    public class ResultTariff
+    public class TariffList
     {
         public float value_exc_vat { get; set; }
         public float value_inc_vat { get; set; }

@@ -62,9 +62,9 @@ namespace Energy_Consumption_Function
 
                 var gasTariff =  HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "gas-tariffs");
 
-                var tariff = await common.GetTariff<ElecTariff>(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code, "electricity-tariffs");
+                var tariff = await common.GetTariff(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code, "electricity-tariffs");
 
-                var tariffGas = await common.GetTariff<GasTariff>(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code,  "gas-tariffs");
+                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code,  "gas-tariffs");
 
                 var dd = tariff.results.Where(x => x.payment_method == "DIRECT_DEBIT").FirstOrDefault();    
 

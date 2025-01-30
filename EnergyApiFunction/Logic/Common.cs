@@ -117,15 +117,15 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo">The end date for the request.</param>
         /// <param name="tariffCode">The tariff code.</param>
         /// <param name="log">The logger instance.</param>
-        /// <returns>An object of either <see cref="GasTariff"/>  or  <see cref="ElecTariff"/> class.</returns>
-        public Task<T> GetTariff<T>(string dateFrom, string dateTo, string tariffCode, string tarifftype) {
+       
+        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, string tarifftype) {
 
             try
             { 
             var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
 
             string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
-            return GetResultAsync<T>(accountDetails,dateFrom, dateTo);
+            return GetResultAsync<Tariff>(accountDetails,dateFrom, dateTo);
             }
             catch(Exception ex)
             {
