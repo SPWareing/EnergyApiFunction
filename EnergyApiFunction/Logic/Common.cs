@@ -1,15 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using Energy_Consumption_Function.Classes;
+﻿using Energy_Consumption_Function.Classes;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace Energy_Consumption_Function.Logic
 {
@@ -27,7 +24,7 @@ namespace Energy_Consumption_Function.Logic
         private readonly string accountNumber = Environment.GetEnvironmentVariable("Account_NO");
         private static readonly string uri = "https://api.octopus.energy/v1/";
 
-        private static  HttpClient _client;
+        private static HttpClient _client;
         private static ILogger _log;
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClient"/> class.
@@ -41,7 +38,7 @@ namespace Energy_Consumption_Function.Logic
         private static HttpClient MyClient(HttpClient _client)
         {
             var client = _client;
-            
+
             client.BaseAddress = new Uri(uri);
 
             client.DefaultRequestHeaders.Accept.Clear();
@@ -51,9 +48,9 @@ namespace Energy_Consumption_Function.Logic
             var base64Credentials = Convert.ToBase64String(byteArray);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
             return client;
-        }        
+        }
 
-       
+
         /// <summary>
         /// Fetches the result from the Octopus Energy API.
         /// </summary>
@@ -87,9 +84,8 @@ namespace Energy_Consumption_Function.Logic
         /// Returns the energy consumption.
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
-        /// <param name="dateTo">The end date for the request.</param>
-        
-        /// <returns>An object of the <see cref="EnergyConsumption"/> class.</returns>
+        /// <param name="dateTo">The end date for the request.</param>        
+        /// <returns>An object of the <see cref="Consumption"/> class.</returns>
         public async Task<Consumption> GetEnergyConsumption(string dateFrom, string dateTo)
         {
             string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";
@@ -100,9 +96,8 @@ namespace Energy_Consumption_Function.Logic
         /// Returns the gas consumption.
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
-        /// <param name="dateTo">The end date for the request.</param>
-        /// <param name="log">The logger instance.</param>
-        /// <returns>An object of the <see cref="GasConsumption"/> class.</returns>
+        /// <param name="dateTo">The end date for the request.</param>       
+        /// <returns>An object of the <see cref="Consumption"/> class.</returns>
         public async Task<Consumption> GetGasConsumption(string dateFrom, string dateTo)
         {
             string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";
@@ -115,39 +110,39 @@ namespace Energy_Consumption_Function.Logic
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>
-        /// <param name="tariffCode">The tariff code.</param>
-        /// <param name="log">The logger instance.</param>
-       
-        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, string tarifftype) {
+        /// <param name="tariffCode">The tariff code.</param>        
+
+        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, string tarifftype)
+        {
 
             try
-            { 
-            var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
+            {
+                var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
 
-            string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
-            return GetResultAsync<Tariff>(accountDetails,dateFrom, dateTo);
+                string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
+                return GetResultAsync<Tariff>(accountDetails, dateFrom, dateTo);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.LogError($"Error fetching gas tariff: {ex.Message}");
                 return default;
             }
         }
 
-        public async Task<AccountDetails>GetAccountDetails()
+        public async Task<AccountDetails> GetAccountDetails()
         {
             try
             {
                 string accountDetails = $"accounts/{accountNumber}/";
                 return await _client.GetFromJsonAsync<AccountDetails>(accountDetails);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.LogError($"Error fetching account details: {ex.Message}");
                 throw;
             }
         }
-       
+
 
     }
 
