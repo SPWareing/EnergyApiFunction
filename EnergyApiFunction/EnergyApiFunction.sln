@@ -1,0 +1,54 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy Function", "Energy Function.csproj", "{1039D027-F07A-034E-528F-2EE38E09A5F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "obj", "obj", "{CA285D67-BB6D-2923-29FD-B5A1C6B8EB24}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{3DB07252-4F5B-61B7-192E-6C40720DF607}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net48", "net48", "{009EAFFA-312B-2F86-DEB2-38AD417D6576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerExtensions", "obj\Debug\net48\WorkerExtensions\WorkerExtensions.csproj", "{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release", "Release", "{DA95AA47-ED09-4F06-18B9-BFDCCE25247A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net48", "net48", "{0371A600-47AB-E893-89AC-8EA760BDE102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerExtensions", "obj\Release\net48\WorkerExtensions\WorkerExtensions.csproj", "{5D09BF64-89F1-94CE-1284-A900B6351B69}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1039D027-F07A-034E-528F-2EE38E09A5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1039D027-F07A-034E-528F-2EE38E09A5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1039D027-F07A-034E-528F-2EE38E09A5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1039D027-F07A-034E-528F-2EE38E09A5F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D09BF64-89F1-94CE-1284-A900B6351B69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D09BF64-89F1-94CE-1284-A900B6351B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D09BF64-89F1-94CE-1284-A900B6351B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D09BF64-89F1-94CE-1284-A900B6351B69}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3DB07252-4F5B-61B7-192E-6C40720DF607} = {CA285D67-BB6D-2923-29FD-B5A1C6B8EB24}
+		{009EAFFA-312B-2F86-DEB2-38AD417D6576} = {3DB07252-4F5B-61B7-192E-6C40720DF607}
+		{01CB76CE-B96C-8C9C-55EF-4F0CFF5122AA} = {009EAFFA-312B-2F86-DEB2-38AD417D6576}
+		{DA95AA47-ED09-4F06-18B9-BFDCCE25247A} = {CA285D67-BB6D-2923-29FD-B5A1C6B8EB24}
+		{0371A600-47AB-E893-89AC-8EA760BDE102} = {DA95AA47-ED09-4F06-18B9-BFDCCE25247A}
+		{5D09BF64-89F1-94CE-1284-A900B6351B69} = {0371A600-47AB-E893-89AC-8EA760BDE102}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {015BF572-86BC-4532-8A83-72ACB21438F8}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/ProjectEvaluation
+/.vs/EnergyApiFunction/DesignTimeBuild
+/.vs/EnergyApiFunction/FileContentIndex
+
+/.vs/EnergyApiFunction/v17/
+/.vs/EnergyApiFunction/v17/
+
