@@ -28,7 +28,7 @@ namespace Energy_Consumption_Function
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
         {
             _logger.LogInformation($"{nameof(OctopusConsumptionFunction)} processed a request.");
-            var common = new Common(_client, _logger);
+           
 
             string dateFrom = req.Query["from"];
             string dateTo = req.Query["to"];
@@ -51,6 +51,8 @@ namespace Energy_Consumption_Function
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
 
+            var common = new Common(_client, _logger);
+
             try
             {
                 var account = await common.GetAccountDetails();
@@ -66,9 +68,9 @@ namespace Energy_Consumption_Function
 
                 var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code,  "gas-tariffs");
 
-                var dd = tariff.results.Where(x => x.payment_method == "DIRECT_DEBIT").FirstOrDefault();    
+                var dd = HelperFunctions.GetFirstTariffResponse(tariff);
 
-                var ddGas = tariffGas.results.Where(x => x.payment_method == "DIRECT_DEBIT").FirstOrDefault();
+                var ddGas = HelperFunctions.GetFirstTariffResponse(tariffGas);
 
                 _logger.LogInformation("Calling GetEnergyConsumption: From: {0}, {1}", dateFrom, dateTo);
                 var response = await common.GetEnergyConsumption(dateFrom, dateTo);
@@ -84,9 +86,10 @@ namespace Energy_Consumption_Function
                 {
                     Electricity = join,
                     Gas = gasJoin
-                };  
-                _logger.LogInformation("Response: {0}", JsonConvert.SerializeObject(mergedResponse));
+                };
                 string responseMessage = JsonConvert.SerializeObject(mergedResponse);
+                _logger.LogInformation("Electricity Response: {0}, Gas Response: {1}", mergedResponse.Electricity.Count, mergedResponse.Gas.Count);
+               
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.OK, responseMessage);
 
 

@@ -1,6 +1,7 @@
 ﻿using Energy_Consumption_Function.Classes;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,7 +109,14 @@ namespace Energy_Consumption_Function.Logic
             responseMessageData.WriteString(message);
             return responseMessageData;
         }
+        public static TariffList GetFirstTariffResponse(Tariff tariff)
+        {
+            var result = tariff.results.Where(x => x.payment_method == "DIRECT_DEBIT").FirstOrDefault();
+            return result;
+        }
     }
+
+   
 
     }
 
