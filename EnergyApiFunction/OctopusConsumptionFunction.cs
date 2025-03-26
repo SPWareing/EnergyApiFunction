@@ -50,8 +50,8 @@ namespace Energy_Consumption_Function
             {
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
-
-            var common = new Common(_client, _logger);
+            
+            var common = new Common(new HttpClient(), _logger);
 
             try
             {
@@ -60,13 +60,13 @@ namespace Energy_Consumption_Function
                 var dateFromUtc = DateTime.Parse(dateFrom).Date;
                 var dateToUtc = DateTime.Parse(dateTo).Date;
 
-                var elecTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "electricity-tariffs");                  
+                var elecTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "electricity-tariffs");
 
-                var gasTariff =  HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "gas-tariffs");
+                var gasTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "gas-tariffs");
 
                 var tariff = await common.GetTariff(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code, "electricity-tariffs");
 
-                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code,  "gas-tariffs");
+                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code, "gas-tariffs");
 
                 var dd = HelperFunctions.GetFirstTariffResponse(tariff);
 
@@ -80,7 +80,7 @@ namespace Energy_Consumption_Function
                 _logger.LogInformation("Calling GetGasConsumption: From: {0}, {1}", dateFrom, dateTo);
                 var gasResponse = await common.GetGasConsumption(dateFrom, dateTo);
 
-                var gasJoin = HelperFunctions.JoinConsumptionTariffs(gasResponse, ddGas);              
+                var gasJoin = HelperFunctions.JoinConsumptionTariffs(gasResponse, ddGas);
 
                 var mergedResponse = new RequestResponse
                 {
@@ -89,7 +89,8 @@ namespace Energy_Consumption_Function
                 };
                 string responseMessage = JsonConvert.SerializeObject(mergedResponse);
                 _logger.LogInformation("Electricity Response: {0}, Gas Response: {1}", mergedResponse.Electricity.Count, mergedResponse.Gas.Count);
-               
+
+
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.OK, responseMessage);
 
 
@@ -99,6 +100,9 @@ namespace Energy_Consumption_Function
                 _logger.LogError(ex.Message);
 
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "An error occured");
+            }
+            finally {
+                _client.Dispose();
             }
         }
 
