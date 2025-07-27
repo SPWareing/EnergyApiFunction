@@ -1,4 +1,5 @@
 ﻿using Energy_Consumption_Function.Classes;
+using Energy_Consumption_Function.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -112,14 +113,17 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo">The end date for the request.</param>
         /// <param name="tariffCode">The tariff code.</param>        
 
-        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, string tarifftype)
+        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, TariffType tarifftype)
         {
 
             try
             {
+
+                var tariffTypeString = TariffTypeExtension.ToFriendlyString(tarifftype);
+
                 var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
 
-                string accountDetails = $"products/{baseCode}/{tarifftype}/{tariffCode}/standard-unit-rates/?";
+                string accountDetails = $"products/{baseCode}/{tariffTypeString}/{tariffCode}/standard-unit-rates/?";
                 return GetResultAsync<Tariff>(accountDetails, dateFrom, dateTo);
             }
             catch (Exception ex)

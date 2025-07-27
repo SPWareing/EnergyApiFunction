@@ -1,4 +1,5 @@
 ﻿using Energy_Consumption_Function.Classes;
+using Energy_Consumption_Function.Enums;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -9,7 +10,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
+
 
 namespace Energy_Consumption_Function.Logic
 {
@@ -64,18 +65,18 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo"> UTC Format Date </param>
         /// <param name="tariffType"> Either "electricity-tariffs" or "gas-tariffs" </param>
         /// <returns> A list of <see cref="Agreement"/></returns>
-        public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, string tariffType)
+        public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, TariffType tariffType)
         {
             switch (tariffType)
             {
 
-                case "electricity-tariffs":
+                case TariffType.Electricity:
                     return account.properties.First()
                                 .electricity_meter_points.First()
                                 .agreements
                                 .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
                                 .ToList();
-                case "gas-tariffs":
+                case TariffType.Gas:
                     return account.properties.First()
                                 .gas_meter_points.First()
                                 .agreements

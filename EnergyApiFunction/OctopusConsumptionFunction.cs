@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Energy_Consumption_Function.Classes;
 using Energy_Consumption_Function.Logic;
+using Energy_Consumption_Function.Enums;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 
 namespace Energy_Consumption_Function
 {
@@ -60,13 +62,13 @@ namespace Energy_Consumption_Function
                 var dateFromUtc = DateTime.Parse(dateFrom).Date;
                 var dateToUtc = DateTime.Parse(dateTo).Date;
 
-                var elecTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "electricity-tariffs");
+                var elecTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, TariffType.Electricity);
 
-                var gasTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, "gas-tariffs");
+                var gasTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, TariffType.Gas);
 
-                var tariff = await common.GetTariff(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code, "electricity-tariffs");
+                var tariff = await common.GetTariff(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code,TariffType.Electricity);
 
-                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code, "gas-tariffs");
+                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code, TariffType.Gas);
 
                 var dd = HelperFunctions.GetFirstTariffResponse(tariff);
 
