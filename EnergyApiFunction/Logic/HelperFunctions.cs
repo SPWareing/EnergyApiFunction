@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace Energy_Consumption_Function.Logic
 {
     public  class HelperFunctions
     {
+        private static readonly string DirectDebit = "DIRECT_DEBIT";
         /// <summary>
         /// Returns a dictionary of the dates in UTC format.
         /// </summary>
@@ -63,7 +65,7 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="account"> Account Details of the User </param>
         /// <param name="dateFrom"> UTC Format Date </param>
         /// <param name="dateTo"> UTC Format Date </param>
-        /// <param name="tariffType"> Either "electricity-tariffs" or "gas-tariffs" </param>
+        /// <param name="tariffType"> <see cref="TariffType"/> </param>
         /// <returns> A list of <see cref="Agreement"/></returns>
         public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, TariffType tariffType)
         {
@@ -112,7 +114,7 @@ namespace Energy_Consumption_Function.Logic
         }
         public static TariffList GetFirstTariffResponse(Tariff tariff)
         {
-            var result = tariff.results.Where(x => x.payment_method == "DIRECT_DEBIT").FirstOrDefault();
+            var result = tariff.results.Where(x => x.payment_method == HelperFunctions.DirectDebit).FirstOrDefault();
             return result;
         }
     }
