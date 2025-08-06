@@ -69,24 +69,21 @@ namespace Energy_Consumption_Function.Logic
         /// <returns> A list of <see cref="Agreement"/></returns>
         public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, TariffType tariffType)
         {
-            switch (tariffType)
+            return tariffType switch
             {
 
-                case TariffType.Electricity:
-                    return account.properties.First()
+                TariffType.Electricity => account.properties.First()
                                 .electricity_meter_points.First()
                                 .agreements
                                 .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList();
-                case TariffType.Gas:
-                    return account.properties.First()
+                                .ToList(),
+                TariffType.Gas => account.properties.First()
                                 .gas_meter_points.First()
                                 .agreements
                                 .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList();
-                default:
-                    return new List<Agreement>();
-            }
+                                .ToList(),
+                _ => throw new ArgumentOutOfRangeException(nameof(tariffType), tariffType, null)
+            };
 
 
         }
