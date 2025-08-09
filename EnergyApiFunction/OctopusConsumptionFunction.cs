@@ -20,10 +20,11 @@ namespace Energy_Consumption_Function
         private readonly ILogger<OctopusConsumptionFunction> _logger;
         private readonly HttpClient _client;
 
-        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger, HttpClient client)
+        public OctopusConsumptionFunction(ILogger<OctopusConsumptionFunction> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _client = client;
+            _client = httpClientFactory.CreateClient("Octopus");
+            ;
         }
 
         [Function("ConsumptionFunction")]
@@ -53,7 +54,7 @@ namespace Energy_Consumption_Function
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
             
-            var common = new Common(new HttpClient(), _logger);
+            var common = new Common(_client, _logger);
 
             try
             {
@@ -104,7 +105,8 @@ namespace Energy_Consumption_Function
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "An error occured");
             }
             finally {
-                _client.Dispose();
+                // _client.Dispose();
+                
             }
         }
 
