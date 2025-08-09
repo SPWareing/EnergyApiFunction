@@ -11,3 +11,5 @@
 
 /.vs/EnergyApiFunction/CopilotIndices
 /.vs/
+/UnitTest/bin
+/UnitTest/obj
