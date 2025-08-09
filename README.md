@@ -56,6 +56,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 TODO: 
 
-[ ] Add Tests
+[ X ] Add Tests
 
 [ ] Add React App repo reference
