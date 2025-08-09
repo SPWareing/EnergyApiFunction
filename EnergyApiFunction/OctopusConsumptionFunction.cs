@@ -40,12 +40,11 @@ namespace Energy_Consumption_Function
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();          
             Energy energyResponse = JsonConvert.DeserializeObject<Energy>(requestBody);
 
-            _logger.LogInformation($"From : {energyResponse}, To: {energyResponse?.to}");
+            _logger.LogInformation($"From : {energyResponse.from}, To: {energyResponse?.to}");
 
             dateFrom ??= energyResponse?.from.ToString();
             dateTo ??= energyResponse?.to.ToString();
-            energyType ??= energyResponse?.energyType;
-            _logger.LogInformation($"Logging Statement: {energyResponse}");
+            energyType ??= energyResponse?.energyType;          
 
 
             if (!DateTime.TryParse(dateFrom, out var dateFromUtc) || !DateTime.TryParse(dateTo, out var dateToUtc) || string.IsNullOrEmpty(energyType))
