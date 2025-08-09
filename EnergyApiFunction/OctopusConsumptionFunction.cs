@@ -36,22 +36,15 @@ namespace Energy_Consumption_Function
             string dateFrom = req.Query["from"];
             string dateTo = req.Query["to"];
             string energyType = req.Query["energyType"];
+            _logger.LogInformation($"Query Parameters - From: {dateFrom}, To: {dateTo}, Energy Type: {energyType}");            
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();          
-            Energy energyResponse = JsonConvert.DeserializeObject<Energy>(requestBody);
-
-            _logger.LogInformation($"From : {energyResponse.from}, To: {energyResponse?.to}");
-
-            dateFrom ??= energyResponse?.from.ToString();
-            dateTo ??= energyResponse?.to.ToString();
-            energyType ??= energyResponse?.energyType;          
-
+            
 
             if (!DateTime.TryParse(dateFrom, out var dateFromUtc) || !DateTime.TryParse(dateTo, out var dateToUtc) || string.IsNullOrEmpty(energyType))
             {
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
-            
+            _logger.LogInformation($"Parsed Date From: {dateFromUtc}, Date To: {dateToUtc}, Energy Type: {energyType}");
             var common = new Common(_client, _logger);
 
             try
