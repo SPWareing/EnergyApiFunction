@@ -37,8 +37,7 @@ namespace Energy_Consumption_Function
             string dateTo = req.Query["to"];
             string energyType = req.Query["energyType"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();          
             Energy energyResponse = JsonConvert.DeserializeObject<Energy>(requestBody);
 
             _logger.LogInformation($"From : {energyResponse}, To: {energyResponse?.to}");
@@ -46,10 +45,10 @@ namespace Energy_Consumption_Function
             dateFrom ??= energyResponse?.from.ToString();
             dateTo ??= energyResponse?.to.ToString();
             energyType ??= energyResponse?.energyType;
-            _logger.LogInformation($"Logging Statement: {data}");
+            _logger.LogInformation($"Logging Statement: {energyResponse}");
 
 
-            if (string.IsNullOrEmpty(dateFrom) || string.IsNullOrEmpty(dateTo) || string.IsNullOrEmpty(energyType))
+            if (!DateTime.TryParse(dateFrom, out var dateFromUtc) || !DateTime.TryParse(dateTo, out var dateToUtc) || string.IsNullOrEmpty(energyType))
             {
                 return HelperFunctions.FormatResponse(req, HttpStatusCode.BadRequest, "Please pass a date range and energy type on the query string or in the request body");
             }
@@ -60,30 +59,27 @@ namespace Energy_Consumption_Function
             {
                 var account = await common.GetAccountDetails();
 
-                var dateFromUtc = DateTime.Parse(dateFrom).Date;
-                var dateToUtc = DateTime.Parse(dateTo).Date;
+                dateFromUtc = dateFromUtc.Date;
+                dateFromUtc = dateFromUtc.Date;
 
                 var elecTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, TariffType.Electricity);
+                var gasTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, TariffType.Gas);                
 
-                var gasTariff = HelperFunctions.GetAgreementCost(account, dateFromUtc, dateToUtc, TariffType.Gas);
+                var elecTariffCode = elecTariff.FirstOrDefault()?.tariff_code;
+                var gasTariffCode = gasTariff.FirstOrDefault()?.tariff_code;
 
-                var tariff = await common.GetTariff(dateFrom, dateTo, elecTariff.FirstOrDefault().tariff_code,TariffType.Electricity);
-
-                var tariffGas = await common.GetTariff(dateFrom, dateTo, gasTariff.FirstOrDefault().tariff_code, TariffType.Gas);
-
-                var dd = HelperFunctions.GetFirstTariffResponse(tariff);
-
-                var ddGas = HelperFunctions.GetFirstTariffResponse(tariffGas);
-
+                var tariffTask = common.GetTariff(dateFrom, dateTo, elecTariffCode,TariffType.Electricity);
+                var tariffGasTask = common.GetTariff(dateFrom, dateTo, gasTariffCode, TariffType.Gas);
                 _logger.LogInformation("Calling GetEnergyConsumption: From: {0}, {1}", dateFrom, dateTo);
-                var response = await common.GetEnergyConsumption(dateFrom, dateTo);
-
-                var join = HelperFunctions.JoinConsumptionTariffs(response, dd);
-
+                var responseTask = common.GetEnergyConsumption(dateFrom, dateTo);
                 _logger.LogInformation("Calling GetGasConsumption: From: {0}, {1}", dateFrom, dateTo);
-                var gasResponse = await common.GetGasConsumption(dateFrom, dateTo);
+                var gasResponseTask = common.GetGasConsumption(dateFrom, dateTo);
+                await Task.WhenAll(tariffTask, tariffGasTask, responseTask, gasResponseTask);
 
-                var gasJoin = HelperFunctions.JoinConsumptionTariffs(gasResponse, ddGas);
+                var dd = HelperFunctions.GetFirstTariffResponse(await tariffTask);
+                var ddGas = HelperFunctions.GetFirstTariffResponse(await tariffGasTask);
+                var join = HelperFunctions.JoinConsumptionTariffs(await responseTask, dd);
+                var gasJoin = HelperFunctions.JoinConsumptionTariffs(await gasResponseTask, ddGas);
 
                 var mergedResponse = new RequestResponse
                 {
