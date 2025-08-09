@@ -1,21 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
-		<RootNamespace>My.Namespace</RootNamespace>
-		<OutputType>Exe</OutputType>
-		<StartupObject>Energy_Consumption_Function.Program</StartupObject>
+		<RootNamespace>Energy_Consumption_Function</RootNamespace>
+		<OutputType>Exe</OutputType>		
 		<LangVersion>9.0</LangVersion>
 		<PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Azure.Identity" Version="1.13.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
-		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.1" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Net.Http.Json" Version="9.0.3" />
+		<PackageReference Include="System.Net.Http.Json" Version="9.0.8" />
 		<!-- Other packages may also be in this list -->
 	</ItemGroup>
 	<ItemGroup>

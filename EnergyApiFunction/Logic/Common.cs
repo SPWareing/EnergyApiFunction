@@ -16,8 +16,7 @@ namespace Energy_Consumption_Function.Logic
     /// Provides common functionality for interacting with the Octopus Energy API.
     /// </summary>
     public class Common
-    {
-        private static readonly string userName = Environment.GetEnvironmentVariable("ApiKEY");
+    {        
         private readonly string mpan = Environment.GetEnvironmentVariable("Elec_MPAN");
         private readonly string serial = Environment.GetEnvironmentVariable("Elec_SERIAL");
         private readonly string gasMprn = Environment.GetEnvironmentVariable("GAS_MPRN");
@@ -25,31 +24,18 @@ namespace Energy_Consumption_Function.Logic
         private readonly string accountNumber = Environment.GetEnvironmentVariable("Account_NO");
         private static readonly string uri = "https://api.octopus.energy/v1/";
 
-        private static HttpClient _client;
-        private static ILogger _log;
+        private readonly HttpClient _client;
+        private readonly ILogger _log;
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClient"/> class.
         /// </summary>
         /// <returns>An initialized <see cref="HttpClient"/> instance.</returns>
         public Common(HttpClient client, ILogger log)
         {
-            _client = MyClient(client);
+            _client = client;
             _log = log;
         }
-        private static HttpClient MyClient(HttpClient _client)
-        {
-            var client = _client;
-
-            client.BaseAddress = new Uri(uri);
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            string password = "";
-            var byteArray = Encoding.ASCII.GetBytes($"{userName}:{password}");
-            var base64Credentials = Convert.ToBase64String(byteArray);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
-            return client;
-        }
+       
 
 
         /// <summary>
