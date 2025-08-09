@@ -42,9 +42,9 @@ namespace Energy_Consumption_Function
 
             _logger.LogInformation($"From : {energyResponse}, To: {energyResponse?.to}");
 
-            dateFrom = dateFrom ?? energyResponse?.from.ToString();
-            dateTo = dateTo ?? energyResponse?.to.ToString();
-            energyType = energyType ?? energyResponse?.energyType;
+            dateFrom ??= energyResponse?.from.ToString();
+            dateTo ??= energyResponse?.to.ToString();
+            energyType ??= energyResponse?.energyType;
             _logger.LogInformation($"Logging Statement: {data}");
 
 
