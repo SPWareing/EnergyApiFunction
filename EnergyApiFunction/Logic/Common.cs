@@ -87,24 +87,17 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>        
         /// <returns>An object of the <see cref="Consumption"/> class.</returns>
-        public async Task<Consumption> GetEnergyConsumption(string dateFrom, string dateTo)
-        {
-            string accountDetails = $"electricity-meter-points/{mpan}/meters/{serial}/consumption/?";
-            return await GetResultAsync<Consumption>(accountDetails, dateFrom, dateTo);
-
-        }
+        public async Task<Consumption> GetEnergyConsumption(string dateFrom, string dateTo) => 
+            await GetResultAsync<Consumption>($"electricity-meter-points/{mpan}/meters/{serial}/consumption/?", dateFrom, dateTo);
+       
         /// <summary>
         /// Returns the gas consumption.
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>       
         /// <returns>An object of the <see cref="Consumption"/> class.</returns>
-        public async Task<Consumption> GetGasConsumption(string dateFrom, string dateTo)
-        {
-            string accountDetails = $"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?";
-            return await GetResultAsync<Consumption>(accountDetails, dateFrom, dateTo);
-        }
-
+        public async Task<Consumption> GetGasConsumption(string dateFrom, string dateTo) =>
+            await GetResultAsync<Consumption>($"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?", dateFrom, dateTo);      
 
         /// <summary>
         /// Returns the Tariff .
