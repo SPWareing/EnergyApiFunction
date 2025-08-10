@@ -11,6 +11,7 @@ namespace UnitTest.TestBase
     public abstract  class TestBaseClass
     {
         protected Mock<ILogger> LoggerMock { get; }
+        protected Mock<HttpClient> HttpClientMock { get; } = new Mock<HttpClient>();
 
         protected TestBaseClass()
         {

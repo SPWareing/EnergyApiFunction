@@ -18,6 +18,7 @@ namespace UnitTest.Helper
     {
         [TestMethod]
         [DataRow("ABC-12-34-56", "ABC-12-34-56")] // valid
+        [DataRow("1234/ABC-12-34-56", "ABC-12-34-56")] // valid
         [DataRow("XYZ-99-88-77", "XYZ-99-88-77")] // valid
         [DataRow("INVALID", "")]                  // invalid
         [DataRow("", "")]                         // empty
