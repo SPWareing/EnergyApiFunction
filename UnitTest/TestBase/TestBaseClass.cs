@@ -12,6 +12,7 @@ namespace UnitTest.TestBase
     {
         protected Mock<ILogger> LoggerMock { get; }
         protected Mock<HttpClient> HttpClientMock { get; } = new Mock<HttpClient>();
+        protected Mock<HttpMessageHandler> HandlerMock { get; } = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
         protected TestBaseClass()
         {

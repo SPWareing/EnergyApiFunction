@@ -18,9 +18,8 @@ namespace UnitTest.Common
     public class GetAccountDetailsTests : TestBaseClass
 
     {
-        private Mock<HttpMessageHandler> HandlerMock { get; } = new Mock<HttpMessageHandler>(MockBehavior.Strict)
-        {
-        };
+        //private Mock<HttpMessageHandler> HandlerMock { get; } = new Mock<HttpMessageHandler>(MockBehavior.Strict)
+        
 
         [TestCleanup]
         public void Cleanup()

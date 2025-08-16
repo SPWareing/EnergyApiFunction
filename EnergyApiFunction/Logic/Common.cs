@@ -9,6 +9,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Energy_Consumption_Function.Logic
 {
 
@@ -53,6 +54,8 @@ namespace Energy_Consumption_Function.Logic
             var requestBody = HelperFunctions.GetDates(dateFrom, dateTo);
             var queryString = string.Join("&", requestBody.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             var request = $"{accountDetails}{queryString}";
+
+            
 
             try
             {

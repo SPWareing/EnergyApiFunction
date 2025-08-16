@@ -1,5 +1,6 @@
 ﻿using Energy_Consumption_Function.Classes;
 using Energy_Consumption_Function.Enums;
+using Energy_Consumption_Function.Interfaces;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -18,6 +19,10 @@ namespace Energy_Consumption_Function.Logic
     public  class HelperFunctions
     {
         private static readonly string DirectDebit = "DIRECT_DEBIT";
+        public const string PeriodFrom = "period_from";
+        public const string PeriodTo = "period_to";
+        public const string OrderBy = "order_by";
+        public const string PageSize = "page_size";
         /// <summary>
         /// Returns a dictionary of the dates in UTC format.
         /// </summary>
@@ -29,12 +34,11 @@ namespace Energy_Consumption_Function.Logic
             string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
             return new Dictionary<string, string>()
             {
-                { "period_from",DateTime.Parse(dateFrom).ToString(dateFormat) },
-                { "period_to" ,DateTime.Parse(dateTo).ToString(dateFormat) },
-                { "order_by" ,"period"},
-                {"page_size","200"}
+                {PeriodFrom, DateTime.Parse(dateFrom).ToString(dateFormat) },
+                {PeriodTo, DateTime.Parse(dateTo).ToString(dateFormat) },
+                {OrderBy, "period" },
+                { PageSize, "200" }
             };
-
         }
 
         /// <summary>
@@ -69,23 +73,34 @@ namespace Energy_Consumption_Function.Logic
         /// <returns> A list of <see cref="Agreement"/></returns>
         public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, TariffType tariffType)
         {
-            return tariffType switch
+
+            bool IsValidAgreement(Agreement x) => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null);
+
+            var firstProperty = account.properties.FirstOrDefault();
+
+            if (firstProperty is null)
+            {
+                throw new ArgumentNullException(nameof(account.properties), "No properties found in account details.");
+            }
+
+            IEnumerable<Agreement>? GetAgreements<TMeterPoint>(Func<Property, IEnumerable<TMeterPoint>> getMeterPoints)
+    where TMeterPoint : class,IMeterPoint
+            {
+                return getMeterPoints(firstProperty)?.FirstOrDefault()?.agreements;
+            }
+
+            var agreements = tariffType switch
             {
 
-                TariffType.Electricity => account.properties.First()
-                                .electricity_meter_points.First()
-                                .agreements
-                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList(),
-                TariffType.Gas => account.properties.First()
-                                .gas_meter_points.First()
-                                .agreements
-                                .Where(x => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null))
-                                .ToList(),
+                TariffType.Electricity => GetAgreements<Electricity_Meter_Points>(p=> p.electricity_meter_points),
+
+
+                TariffType.Gas => GetAgreements<Gas_Meter_Points>(p => p.gas_meter_points),
+
                 _ => throw new ArgumentOutOfRangeException(nameof(tariffType), tariffType, null)
             };
 
-
+            return agreements?.Where(IsValidAgreement).ToList() ?? new List<Agreement>();
         }
 
         public static List<MergedResponse> JoinConsumptionTariffs(Consumption response, TariffList dd)
