@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
+using Energy_Consumption_Function.Interfaces;
 
 namespace Energy_Consumption_Function.Classes
 {
     /// <summary>
     /// Represents gas consumption data.
     /// </summary>
-    public class Consumption
+    public class Consumption: IPaging
     {
         /// <summary>
         /// Gets or sets the count of gas consumption records.

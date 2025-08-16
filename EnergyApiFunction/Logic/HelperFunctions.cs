@@ -3,15 +3,12 @@ using Energy_Consumption_Function.Enums;
 using Energy_Consumption_Function.Interfaces;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 
 
 namespace Energy_Consumption_Function.Logic
@@ -31,14 +28,22 @@ namespace Energy_Consumption_Function.Logic
         /// <returns>A dictionary containing the start and end dates in UTC format.</returns>
         public static Dictionary<string, string> GetDates(string dateFrom, string dateTo)
         {
-            string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
+            
             return new Dictionary<string, string>()
             {
-                {PeriodFrom, DateTime.Parse(dateFrom).ToString(dateFormat) },
-                {PeriodTo, DateTime.Parse(dateTo).ToString(dateFormat) },
+                {PeriodFrom, ParseToUTC(dateFrom) },
+                {PeriodTo, ParseToUTC(dateTo) },
                 {OrderBy, "period" },
                 { PageSize, "200" }
             };
+        }
+
+        private static string ParseToUTC(string date)
+        {
+            string dateFormat = "yyyy-MM-ddTHH:mm:ssZ";
+            // Parse the date string to DateTime and convert it to UTC
+            DateTime parsedDate = DateTime.Parse(date);
+            return parsedDate.ToString(dateFormat);
         }
 
         /// <summary>
@@ -73,9 +78,7 @@ namespace Energy_Consumption_Function.Logic
         /// <returns> A list of <see cref="Agreement"/></returns>
         public static List<Agreement> GetAgreementCost(AccountDetails account, DateTime dateFrom, DateTime dateTo, TariffType tariffType)
         {
-
             bool IsValidAgreement(Agreement x) => dateFrom >= x.valid_from.Date && (dateTo <= x.valid_to || x.valid_to is null);
-
             var firstProperty = account.properties.FirstOrDefault();
 
             if (firstProperty is null)
@@ -91,12 +94,8 @@ namespace Energy_Consumption_Function.Logic
 
             var agreements = tariffType switch
             {
-
                 TariffType.Electricity => GetAgreements<Electricity_Meter_Points>(p=> p.electricity_meter_points),
-
-
                 TariffType.Gas => GetAgreements<Gas_Meter_Points>(p => p.gas_meter_points),
-
                 _ => throw new ArgumentOutOfRangeException(nameof(tariffType), tariffType, null)
             };
 

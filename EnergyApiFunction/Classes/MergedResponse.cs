@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Energy_Consumption_Function.Interfaces;
 
 namespace Energy_Consumption_Function.Classes
 {
-    public class MergedResponse
+    public class MergedResponse : IResult
     {
         public DateTime interval_start { get; set; }
         public DateTime interval_end { get; set; }

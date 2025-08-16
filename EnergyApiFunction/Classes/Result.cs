@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Energy_Consumption_Function.Interfaces;
 
 namespace Energy_Consumption_Function.Classes
 {
     /// <summary>
     /// Represents a result of energy or gas consumption.
     /// </summary>
-    public class Result
+    public class Result: IResult
     {
         /// <summary>
         /// Gets or sets the consumption value.

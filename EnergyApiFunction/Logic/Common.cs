@@ -4,15 +4,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
-
 
 namespace Energy_Consumption_Function.Logic
 {
-
     /// <summary>
     /// Provides common functionality for interacting with the Octopus Energy API.
     /// </summary>
@@ -35,9 +31,7 @@ namespace Energy_Consumption_Function.Logic
         {
             _client = client;
             _log = log;
-        }
-       
-
+        }     
 
         /// <summary>
         /// Fetches the result from the Octopus Energy API.
@@ -48,45 +42,47 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo">The end date for the request.</param>
         /// <returns>The result of the request.</returns>
 
-        public async Task<T> GetResultAsync<T>(string accountDetails, string dateFrom, string dateTo)
+        public async Task<T?> GetResultAsync<T>(string accountDetails, string dateFrom, string dateTo)
         {
-
             var requestBody = HelperFunctions.GetDates(dateFrom, dateTo);
             var queryString = string.Join("&", requestBody.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             var request = $"{accountDetails}{queryString}";
 
-            
-
             try
             {
-                _log.LogInformation($"Query String: {queryString}");
-                _log.LogInformation($"Request: {request}");
+                _log.LogInformation("Query String: {QueryString}", queryString);
+                _log.LogInformation("Request: {Request}", request);
                 var response = await _client.GetFromJsonAsync<T>(request);
                 return response;
             }
             catch (Exception ex)
             {
-                _log.LogError($"Error fetching results: {ex.Message}");
+                _log.LogError(ex, "Error fetching results for request: {Request}", request);
                 return default;
             }
         }
+        
         /// <summary>
         /// Returns the energy consumption.
         /// </summary>
         /// <param name="dateFrom">The start date for the request.</param>
-        /// <param name="dateTo">The end date for the request.</param>        
-        /// <returns>An object of the <see cref="Consumption"/> class.</returns>
-        public async Task<Consumption> GetEnergyConsumption(string dateFrom, string dateTo) => 
-            await GetResultAsync<Consumption>($"electricity-meter-points/{mpan}/meters/{serial}/consumption/?", dateFrom, dateTo);
-       
-        /// <summary>
-        /// Returns the gas consumption.
-        /// </summary>
-        /// <param name="dateFrom">The start date for the request.</param>
         /// <param name="dateTo">The end date for the request.</param>       
         /// <returns>An object of the <see cref="Consumption"/> class.</returns>
-        public async Task<Consumption> GetGasConsumption(string dateFrom, string dateTo) =>
-            await GetResultAsync<Consumption>($"gas-meter-points/{gasMprn}/meters/{gasSerial}/consumption/?", dateFrom, dateTo);      
+        public async Task<Consumption?> GetConsumption(string dateFrom, string dateTo, TariffType tariffType)
+        {
+            
+            var meterType = tariffType switch
+            {
+                TariffType.Electricity => new  MeterType{ Type = "electricity", Mpan = mpan, Serial = serial },
+                TariffType.Gas => new MeterType { Type = "gas", Mpan = gasMprn, Serial = gasSerial },
+                _ => throw new ArgumentOutOfRangeException(nameof(tariffType), tariffType, null)
+            };
+
+            return
+                await GetResultAsync<Consumption>(ComposeConsumption(meterType), dateFrom, dateTo);
+        }
+
+        private static string ComposeConsumption(MeterType meterType) => $"{meterType.Type}-meter-points/{meterType.Mpan}/meters/{meterType.Serial}/consumption/?";
 
         /// <summary>
         /// Returns the Tariff .
@@ -95,14 +91,11 @@ namespace Energy_Consumption_Function.Logic
         /// <param name="dateTo">The end date for the request.</param>
         /// <param name="tariffCode">The tariff code.</param>        
 
-        public Task<Tariff> GetTariff(string dateFrom, string dateTo, string tariffCode, TariffType tarifftype)
+        public Task<Tariff?>? GetTariff(string dateFrom, string dateTo, string tariffCode, TariffType tarifftype)
         {
-
             try
             {
-
                 var tariffTypeString = TariffTypeExtension.ToFriendlyString(tarifftype);
-
                 var baseCode = HelperFunctions.GetTariffCode(tariffCode, _log);
 
                 string accountDetails = $"products/{baseCode}/{tariffTypeString}/{tariffCode}/standard-unit-rates/?";
@@ -110,12 +103,12 @@ namespace Energy_Consumption_Function.Logic
             }
             catch (Exception ex)
             {
-                _log.LogError($"Error fetching gas tariff: {ex.Message}");
+                _log.LogError(ex, "Error fetching tariff for code: {TariffCode}", tariffCode);
                 return default;
             }
         }
 
-        public async Task<AccountDetails> GetAccountDetails()
+        public async Task<AccountDetails?> GetAccountDetails()
         {
             try
             {
@@ -124,7 +117,7 @@ namespace Energy_Consumption_Function.Logic
             }
             catch (Exception ex)
             {
-                _log.LogError($"Error fetching account details: {ex.Message}");
+                _log.LogError(ex, "Error fetching account details for account number: {AccountNumber}", accountNumber);
                 throw;
             }
         }

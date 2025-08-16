@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Energy_Consumption_Function.Interfaces;
 
-namespace Energy_Consumption_Function.Classes
+namespace Energy_Consumption_Function.Interfaces
 {
-    public class Tariff: IPaging
+    public interface IPaging
     {
         public int count { get; set; }
-        public object next { get; set; }
         public object previous { get; set; }
-        public TariffList[] results { get; set; }
     }
 }

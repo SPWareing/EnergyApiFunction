@@ -63,9 +63,11 @@ namespace Energy_Consumption_Function
                 var tariffTask = common.GetTariff(dateFrom, dateTo, elecTariffCode,TariffType.Electricity);
                 var tariffGasTask = common.GetTariff(dateFrom, dateTo, gasTariffCode, TariffType.Gas);
                 _logger.LogInformation("Calling GetEnergyConsumption: From: {0}, {1}", dateFrom, dateTo);
-                var responseTask = common.GetEnergyConsumption(dateFrom, dateTo);
+                //var responseTask = common.GetEnergyConsumption(dateFrom, dateTo);
+                var responseTask = common.GetConsumption(dateFrom, dateTo, TariffType.Electricity);
                 _logger.LogInformation("Calling GetGasConsumption: From: {0}, {1}", dateFrom, dateTo);
-                var gasResponseTask = common.GetGasConsumption(dateFrom, dateTo);
+                //var gasResponseTask = common.GetGasConsumption(dateFrom, dateTo);
+                var gasResponseTask = common.GetConsumption(dateFrom, dateTo, TariffType.Gas);
                 await Task.WhenAll(tariffTask, tariffGasTask, responseTask, gasResponseTask);
 
                 var dd = HelperFunctions.GetFirstTariffResponse(await tariffTask);
