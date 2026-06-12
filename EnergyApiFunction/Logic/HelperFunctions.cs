@@ -111,8 +111,15 @@ namespace Energy_Consumption_Function.Logic
         }
         public static TariffList GetFirstTariffResponse(Tariff tariff)
         {
-            var result = tariff.results.Where(x => x.payment_method == HelperFunctions.DirectDebit).FirstOrDefault();
-            return result;
+           
+            var result = tariff?.results?.Where(x => x.payment_method == HelperFunctions.DirectDebit).FirstOrDefault();
+            return result ?? new TariffList
+            {
+                value_exc_vat = 0,
+                value_inc_vat = 0,
+                valid_from = DateTime.MinValue,
+                payment_method = DirectDebit
+            };
         }
     }
 
